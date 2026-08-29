@@ -2178,6 +2178,12 @@ const docTemplate = `{
                         "name": "plug",
                         "in": "formData",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "optional parent plugin",
+                        "name": "parentPlugin",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -5368,6 +5374,163 @@ const docTemplate = `{
                                 {
                                     "type": "object",
                                     "properties": {
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/logViewer/content": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LogViewer"
+                ],
+                "summary": "分块读取日志文件内容",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "日期(YYYY-MM-DD)",
+                        "name": "date",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "日期目录内的日志相对路径",
+                        "name": "path",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "向前读取的字节游标",
+                        "name": "cursor",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回最多500行且不超过2MiB的日志内容",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.LogContent"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/logViewer/dates": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LogViewer"
+                ],
+                "summary": "获取指定月份存在日志的日期",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "月份(YYYY-MM)",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回日志日期和文件数量",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.LogDateList"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/logViewer/files": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LogViewer"
+                ],
+                "summary": "获取指定日期的日志文件",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "日期(YYYY-MM-DD)",
+                        "name": "date",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回递归日志文件列表",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.LogFileList"
+                                        },
                                         "msg": {
                                             "type": "string"
                                         }
@@ -16304,6 +16467,94 @@ const docTemplate = `{
                 }
             }
         },
+        "response.LogContent": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "hasMore": {
+                    "type": "boolean"
+                },
+                "limitedByBytes": {
+                    "type": "boolean"
+                },
+                "lineCount": {
+                    "type": "integer"
+                },
+                "modifiedAt": {
+                    "type": "string"
+                },
+                "nextCursor": {
+                    "type": "integer"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.LogDateItem": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "fileCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.LogDateList": {
+            "type": "object",
+            "properties": {
+                "dates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.LogDateItem"
+                    }
+                },
+                "month": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.LogFileItem": {
+            "type": "object",
+            "properties": {
+                "modifiedAt": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.LogFileList": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.LogFileItem"
+                    }
+                }
+            }
+        },
         "response.LoginResponse": {
             "type": "object",
             "properties": {
@@ -16592,6 +16843,18 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "activeName": {
+                    "type": "string"
+                },
+                "badge": {
+                    "description": "菜单角标文本",
+                    "type": "string"
+                },
+                "badgeDot": {
+                    "description": "菜单角标圆点模式",
+                    "type": "boolean"
+                },
+                "badgeType": {
+                    "description": "菜单角标颜色",
                     "type": "string"
                 },
                 "closeTab": {

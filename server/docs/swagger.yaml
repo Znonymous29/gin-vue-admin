@@ -2083,6 +2083,63 @@ definitions:
       file:
         $ref: '#/definitions/media.FileUploadAndDownload'
     type: object
+  response.LogContent:
+    properties:
+      content:
+        type: string
+      date:
+        type: string
+      hasMore:
+        type: boolean
+      limitedByBytes:
+        type: boolean
+      lineCount:
+        type: integer
+      modifiedAt:
+        type: string
+      nextCursor:
+        type: integer
+      path:
+        type: string
+      size:
+        type: integer
+    type: object
+  response.LogDateItem:
+    properties:
+      date:
+        type: string
+      fileCount:
+        type: integer
+    type: object
+  response.LogDateList:
+    properties:
+      dates:
+        items:
+          $ref: '#/definitions/response.LogDateItem'
+        type: array
+      month:
+        type: string
+    type: object
+  response.LogFileItem:
+    properties:
+      modifiedAt:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: integer
+    type: object
+  response.LogFileList:
+    properties:
+      date:
+        type: string
+      files:
+        items:
+          $ref: '#/definitions/response.LogFileItem'
+        type: array
+    type: object
   response.LoginResponse:
     properties:
       expiresAt:
@@ -2272,6 +2329,15 @@ definitions:
   system.Meta:
     properties:
       activeName:
+        type: string
+      badge:
+        description: 菜单角标文本
+        type: string
+      badgeDot:
+        description: 菜单角标圆点模式
+        type: boolean
+      badgeType:
+        description: 菜单角标颜色
         type: string
       closeTab:
         description: 自动关闭tab
@@ -4340,6 +4406,10 @@ paths:
         name: plug
         required: true
         type: file
+      - description: optional parent plugin
+        in: formData
+        name: parentPlugin
+        type: string
       produces:
       - application/json
       responses:
@@ -6167,6 +6237,96 @@ paths:
       summary: jwt加入黑名单
       tags:
       - Jwt
+  /logViewer/content:
+    get:
+      parameters:
+      - description: 日期(YYYY-MM-DD)
+        in: query
+        name: date
+        required: true
+        type: string
+      - description: 日期目录内的日志相对路径
+        in: query
+        name: path
+        required: true
+        type: string
+      - description: 向前读取的字节游标
+        in: query
+        name: cursor
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回最多500行且不超过2MiB的日志内容
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.LogContent'
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分块读取日志文件内容
+      tags:
+      - LogViewer
+  /logViewer/dates:
+    get:
+      parameters:
+      - description: 月份(YYYY-MM)
+        in: query
+        name: month
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回日志日期和文件数量
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.LogDateList'
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取指定月份存在日志的日期
+      tags:
+      - LogViewer
+  /logViewer/files:
+    get:
+      parameters:
+      - description: 日期(YYYY-MM-DD)
+        in: query
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回递归日志文件列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.LogFileList'
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取指定日期的日志文件
+      tags:
+      - LogViewer
   /mcpApi/addMcpApis:
     post:
       consumes:

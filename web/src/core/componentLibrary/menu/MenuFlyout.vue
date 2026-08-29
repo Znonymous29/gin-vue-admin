@@ -5,6 +5,7 @@ import { FOCUS_RING } from '../utils'
 import { MENU_ICON_BUTTON } from './variants'
 import { visibleItems } from './shared'
 import MenuItem from './MenuItem.vue'
+import MenuBadge from './MenuBadge.vue'
 
 defineOptions({ name: 'GvaMenuFlyout' })
 
@@ -54,7 +55,14 @@ provide('gvaMenuCtx', {
         @click="ctx.select(node.name)"
       >
         <component :is="node.meta.icon" v-if="node.meta.icon" class="h-5 w-5" />
-        <span v-else class="text-[13px]">{{ node.meta.title[0] }}</span>
+        <span v-else-if="!showTitle" class="text-[13px]">{{ node.meta.title[0] }}</span>
+        <span
+          v-if="showTitle"
+          class="w-full truncate px-1 text-center text-[11px] leading-tight"
+        >
+          {{ node.meta.title }}
+        </span>
+        <MenuBadge :meta="node.meta" floating />
       </button>
     </PopoverTrigger>
     <PopoverPortal>

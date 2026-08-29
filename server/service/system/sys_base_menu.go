@@ -75,6 +75,9 @@ func (baseMenuService *BaseMenuService) UpdateBaseMenu(ctx context.Context, menu
 	upDateMap := make(map[string]interface{})
 	upDateMap["keep_alive"] = menu.KeepAlive
 	upDateMap["transition_type"] = menu.TransitionType
+	upDateMap["badge"] = menu.Badge
+	upDateMap["badge_type"] = menu.BadgeType
+	upDateMap["badge_dot"] = menu.BadgeDot
 	upDateMap["close_tab"] = menu.CloseTab
 	upDateMap["default_menu"] = menu.DefaultMenu
 	upDateMap["parent_id"] = menu.ParentId

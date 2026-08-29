@@ -16,6 +16,7 @@ import { cn, FOCUS_RING } from '../utils'
 import { MENU_GAP, visibleItems } from './shared'
 import NavMenuPanel from './NavMenuPanel.vue'
 import HorizontalMoreNode from './HorizontalMoreNode.vue'
+import MenuBadge from './MenuBadge.vue'
 
 defineOptions({ name: 'GvaHorizontalMenu' })
 
@@ -110,6 +111,7 @@ watch(topItems, () => nextTick(measure))
             <NavigationMenuTrigger :class="triggerClass(isActive(item))">
               <component :is="item.meta.icon" v-if="item.meta.icon" class="h-4 w-4" />
               {{ item.meta.title }}
+              <MenuBadge :meta="item.meta" />
               <svg-icon
                 icon="lucide:chevron-down"
                 class="h-3.5 w-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180"
@@ -133,6 +135,7 @@ watch(topItems, () => nextTick(measure))
           >
             <component :is="item.meta.icon" v-if="item.meta.icon" class="h-4 w-4" />
             {{ item.meta.title }}
+            <MenuBadge :meta="item.meta" />
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>
@@ -175,6 +178,7 @@ watch(topItems, () => nextTick(measure))
         >
           <component :is="item.meta.icon" v-if="item.meta.icon" class="h-4 w-4" />
           {{ item.meta.title }}
+          <MenuBadge :meta="item.meta" />
           <svg-icon v-if="hasKids(item)" icon="lucide:chevron-down" class="h-3.5 w-3.5" />
         </span>
       </div>

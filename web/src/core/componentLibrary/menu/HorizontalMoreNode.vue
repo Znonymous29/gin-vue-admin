@@ -7,6 +7,7 @@ import {
   DropdownMenuSubContent
 } from 'reka-ui'
 import { visibleItems } from './shared'
+import MenuBadge from './MenuBadge.vue'
 
 defineOptions({ name: 'GvaHorizontalMoreNode' })
 
@@ -25,6 +26,7 @@ const itemClass =
     <DropdownMenuSubTrigger :class="itemClass">
       <component :is="node.meta.icon" v-if="node.meta.icon" class="h-4 w-4 shrink-0" />
       <span class="flex-1">{{ node.meta.title }}</span>
+      <MenuBadge :meta="node.meta" />
       <svg-icon icon="lucide:chevron-right" class="h-3.5 w-3.5 shrink-0" />
     </DropdownMenuSubTrigger>
     <DropdownMenuPortal>
@@ -48,5 +50,6 @@ const itemClass =
   >
     <component :is="node.meta.icon" v-if="node.meta.icon" class="h-4 w-4 shrink-0" />
     {{ node.meta.title }}
+    <MenuBadge :meta="node.meta" />
   </DropdownMenuItem>
 </template>

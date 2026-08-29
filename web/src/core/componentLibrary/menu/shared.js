@@ -1,6 +1,12 @@
 // menu 的有限枚举与纯工具单一事实源（不含 Vue / 主题依赖，供组件与组合式共用，避免循环依赖）。
 export const MENU_THEMES = ['design', 'light', 'group']
 
+// 菜单角标配色（对应语义 token 的实底色），第一项同时兼作非法 / 空值的回落色。
+export const MENU_BADGE_TYPES = ['error', 'warning', 'success', 'primary', 'info']
+
+// 角标是否需要渲染：圆点开关优先于文本（对齐 el-badge 的 is-dot 语义），两者皆空则不渲染。
+export const hasMenuBadge = (meta) => Boolean(meta?.badgeDot || meta?.badge)
+
 // 顶级横向菜单项间距（px）：同时驱动模板 gap 与溢出计算，避免二者漂移。
 export const MENU_GAP = 8
 

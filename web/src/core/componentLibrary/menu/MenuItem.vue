@@ -5,6 +5,7 @@ import { cn, FOCUS_RING } from '../utils'
 import { menuItemVariants } from './variants'
 import { menuIndent, visibleItems } from './shared'
 import MenuFlyout from './MenuFlyout.vue'
+import MenuBadge from './MenuBadge.vue'
 
 defineOptions({ name: 'GvaMenuItem' })
 
@@ -66,6 +67,7 @@ const onToggle = () => ctx.toggle(props.node)
         class="h-[18px] w-[18px] shrink-0"
       />
       <span class="flex-1 truncate">{{ node.meta.title }}</span>
+      <MenuBadge :meta="node.meta" />
       <svg-icon
         icon="lucide:chevron-down"
         class="h-4 w-4 shrink-0 transition-transform duration-200"
@@ -100,6 +102,14 @@ const onToggle = () => ctx.toggle(props.node)
     <span v-if="!iconOnly" class="flex-1 truncate text-left">{{
       node.meta.title
     }}</span>
+    <span
+      v-else-if="stacked"
+      class="w-full truncate px-1 text-center text-[11px] leading-tight"
+    >
+      {{ node.meta.title }}
+    </span>
+    <!-- 展开态行内靠右；折叠图标态浮到右上角 -->
+    <MenuBadge :meta="node.meta" :floating="iconOnly" />
   </button>
 </template>
 

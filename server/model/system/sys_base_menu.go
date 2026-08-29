@@ -28,6 +28,9 @@ type Meta struct {
 	Icon           string `json:"icon" gorm:"comment:菜单图标"`                      // 菜单图标
 	CloseTab       bool   `json:"closeTab" gorm:"comment:自动关闭tab"`               // 自动关闭tab
 	TransitionType string `json:"transitionType" gorm:"comment:路由切换动画"`        // 路由切换动画
+	Badge          string `json:"badge" gorm:"comment:菜单角标文本"`                 // 菜单角标文本
+	BadgeType      string `json:"badgeType" gorm:"comment:菜单角标颜色"`             // 菜单角标颜色
+	BadgeDot       bool   `json:"badgeDot" gorm:"comment:菜单角标圆点模式"`          // 菜单角标圆点模式
 }
 
 type SysBaseMenuParameter struct {

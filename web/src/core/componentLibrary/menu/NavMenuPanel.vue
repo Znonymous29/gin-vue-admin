@@ -2,6 +2,7 @@
 import { NavigationMenuLink } from 'reka-ui'
 import { cn } from '../utils'
 import { menuIndent, visibleItems } from './shared'
+import MenuBadge from './MenuBadge.vue'
 
 defineOptions({ name: 'GvaNavMenuPanel' })
 
@@ -26,10 +27,11 @@ const linkClass = (name) =>
       <!-- 分支：分组标题 + 递归子列表 -->
       <template v-if="hasKids(node)">
         <div
-          class="whitespace-nowrap pb-1 pr-6 pt-2 text-[12px] font-semibold text-muted-foreground"
+          class="flex items-center gap-2 whitespace-nowrap pb-1 pr-6 pt-2 text-[12px] font-semibold text-muted-foreground"
           :style="{ paddingLeft: menuIndent(depth) }"
         >
           {{ node.meta.title }}
+          <MenuBadge :meta="node.meta" />
         </div>
         <NavMenuPanel
           :items="visibleItems(node.children)"
@@ -48,6 +50,7 @@ const linkClass = (name) =>
       >
         <component :is="node.meta.icon" v-if="node.meta.icon" class="h-4 w-4 shrink-0" />
         {{ node.meta.title }}
+        <MenuBadge :meta="node.meta" />
       </NavigationMenuLink>
     </li>
   </ul>

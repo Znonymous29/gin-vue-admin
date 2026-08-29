@@ -13,11 +13,22 @@
         <el-table-column
           align="left"
           label="展示名称"
-          min-width="120"
+          min-width="160"
           prop="authorityName"
         >
           <template #default="scope">
-            <span>{{ scope.row.meta.title }}</span>
+            <div class="flex items-center gap-2">
+              <span>{{ scope.row.meta.title }}</span>
+              <el-tag
+                v-if="hasMenuBadge(scope.row.meta)"
+                :type="badgeTagType(scope.row.meta.badgeType)"
+                size="small"
+                effect="dark"
+                round
+              >
+                {{ scope.row.meta.badgeDot ? '圆点' : scope.row.meta.badge }}
+              </el-tag>
+            </div>
           </template>
         </el-table-column>
         <el-table-column
@@ -25,6 +36,7 @@
           label="图标"
           min-width="140"
           prop="authorityName"
+          show-overflow-tooltip
         >
           <template #default="scope">
             <div v-if="scope.row.meta.icon" class="icon-column">
@@ -72,7 +84,7 @@
           min-width="360"
           prop="component"
         />
-        <el-table-column align="left" fixed="right" label="操作" :min-width="appStore.operateMinWith">
+        <el-table-column align="left" fixed="right" label="操作" :min-width="280">
           <template #default="scope">
             <el-button
               type="primary"
@@ -268,6 +280,69 @@
                     v-model="form.hidden"
                     style="width: 100%"
                     placeholder="是否在列表隐藏"
+                  >
+                    <el-option :value="false" label="否" />
+                    <el-option :value="true" label="是" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row class="w-full" :gutter="16">
+              <el-col :span="8">
+                <el-form-item prop="meta.badge">
+                  <template #label>
+                    <div class="label-with-tooltip">
+                      <span>标签</span>
+                      <el-tooltip
+                        content="填写后菜单项会出现角标；留空且未开启圆点模式时不显示。"
+                        placement="top"
+                        effect="light"
+                      >
+                        <el-icon><QuestionFilled /></el-icon>
+                      </el-tooltip>
+                    </div>
+                  </template>
+                  <el-input
+                    v-model="form.meta.badge"
+                    autocomplete="off"
+                    placeholder="如 New / 热门，留空不显示"
+                  />
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="角标颜色" prop="meta.badgeType">
+                  <el-select
+                    v-model="form.meta.badgeType"
+                    style="width: 100%"
+                    placeholder="请选择角标颜色"
+                  >
+                    <el-option
+                      v-for="item in badgeTypeOptions"
+                      :key="item.value"
+                      :value="item.value"
+                      :label="item.label"
+                    />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item>
+                  <template #label>
+                    <div class="label-with-tooltip">
+                      <span>圆点模式</span>
+                      <el-tooltip
+                        content="开启后只显示一个小圆点并忽略标签文本，适合做未读提示。"
+                        placement="top"
+                        effect="light"
+                      >
+                        <el-icon><QuestionFilled /></el-icon>
+                      </el-tooltip>
+                    </div>
+                  </template>
+                  <el-select
+                    v-model="form.meta.badgeDot"
+                    style="width: 100%"
+                    placeholder="是否只显示圆点"
                   >
                     <el-option :value="false" label="否" />
                     <el-option :value="true" label="是" />
@@ -567,6 +642,7 @@
   import { QuestionFilled, InfoFilled, Delete } from '@element-plus/icons-vue'
   import { toDoc } from '@/utils/doc'
   import { toLowerCase } from '@/utils/stringFun'
+  import { MENU_BADGE_TYPES, hasMenuBadge } from '@/core/componentLibrary/menu/shared'
   import ComponentsCascader from '@/view/superAdmin/menu/components/components-cascader.vue'
 
   import pathInfo from '@/pathInfo.json'
@@ -577,6 +653,36 @@
   })
 
   const appStore = useAppStore()
+
+  // 角标配色：值取组件库的枚举单一事实源，这里只补中文文案与列表页 el-tag 的类型映射
+  const BADGE_TYPE_LABELS = {
+    error: '危险（红）',
+    warning: '警告（橙）',
+    success: '成功（绿）',
+    primary: '主色',
+    info: '信息'
+  }
+  const BADGE_TAG_TYPES = {
+    error: 'danger',
+    warning: 'warning',
+    success: 'success',
+    primary: 'primary',
+    info: 'info'
+  }
+  const DEFAULT_BADGE_TYPE = MENU_BADGE_TYPES[0]
+  const badgeTypeOptions = MENU_BADGE_TYPES.map((value) => ({
+    value,
+    label: BADGE_TYPE_LABELS[value]
+  }))
+  const badgeTagType = (type) => BADGE_TAG_TYPES[type] || BADGE_TAG_TYPES[DEFAULT_BADGE_TYPE]
+  // 存量菜单没有角标字段，编辑前补齐默认值，避免下拉显示空白
+  const normalizeBadgeMeta = (meta) => {
+    meta.badge = meta.badge || ''
+    meta.badgeType = MENU_BADGE_TYPES.includes(meta.badgeType)
+      ? meta.badgeType
+      : DEFAULT_BADGE_TYPE
+    meta.badgeDot = Boolean(meta.badgeDot)
+  }
 
   const rules = reactive({
     path: [{ required: true, message: '请输入菜单name', trigger: 'blur' }],
@@ -656,7 +762,10 @@
       icon: '',
       defaultMenu: false,
       closeTab: false,
-      keepAlive: false
+      keepAlive: false,
+      badge: '',
+      badgeType: DEFAULT_BADGE_TYPE,
+      badgeDot: false
     },
     parameters: [],
     menuBtn: []
@@ -716,7 +825,10 @@
         icon: '',
         defaultMenu: false,
         closeTab: false,
-        keepAlive: false
+        keepAlive: false,
+        badge: '',
+        badgeType: DEFAULT_BADGE_TYPE,
+        badgeDot: false
       }
     }
   }
@@ -807,6 +919,7 @@
     dialogTitle.value = '编辑菜单'
     const res = await getBaseMenuById({ id })
     form.value = res.data.menu
+    normalizeBadgeMeta(form.value.meta)
     isEdit.value = true
     setOptions()
     dialogFormVisible.value = true

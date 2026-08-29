@@ -22,7 +22,14 @@
             @click="selectTopMenuItem(item.name)"
           >
             <component :is="item.meta.icon" v-if="item.meta.icon" class="h-5 w-5" />
-            <span v-else class="text-[13px]">{{ item.meta.title[0] }}</span>
+            <span v-else-if="!showTitleOnCollapse" class="text-[13px]">{{ item.meta.title[0] }}</span>
+            <span
+              v-if="showTitleOnCollapse"
+              class="w-full truncate px-1 text-center text-[11px] leading-tight"
+            >
+              {{ item.meta.title }}
+            </span>
+            <MenuBadge :meta="item.meta" floating />
           </button>
         </nav>
       </el-scrollbar>
@@ -61,8 +68,8 @@
   import { useMenuActive, useMenuNavigation } from './composables/useMenu'
   import { useSidebarTheme } from './composables/useSidebarTheme'
   import { useSideWidth } from '@/hooks/useSideWidth'
-  import { cn, FOCUS_RING } from '@/core/componentLibrary/utils'
-  import { MENU_ICON_BUTTON } from '@/core/componentLibrary/menu/variants'
+  import { menuNavPad, menuRailButton } from '@/core/componentLibrary/menu/variants'
+  import MenuBadge from '@/core/componentLibrary/menu/MenuBadge.vue'
   import CollapseBar from './CollapseBar.vue'
 
   defineOptions({ name: 'SidebarMode' })
