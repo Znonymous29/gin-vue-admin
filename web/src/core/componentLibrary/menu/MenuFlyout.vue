@@ -1,8 +1,7 @@
 <script setup>
-import { inject, provide, ref } from 'vue'
+import { computed, inject, provide, ref } from 'vue'
 import { PopoverRoot, PopoverTrigger, PopoverPortal, PopoverContent } from 'reka-ui'
-import { FOCUS_RING } from '../utils'
-import { MENU_ICON_BUTTON } from './variants'
+import { menuRailButton } from './variants'
 import { visibleItems } from './shared'
 import MenuItem from './MenuItem.vue'
 import MenuBadge from './MenuBadge.vue'
@@ -25,6 +24,8 @@ const leave = () => {
 }
 const children = () => visibleItems(props.node.children)
 const isActive = () => ctx.active.value === props.node.name
+// 折叠态开启「收起显示标题」：飞出触发按钮在图标下方竖排小字号标题
+const showTitle = computed(() => Boolean(ctx.collapsedShowTitle?.value))
 
 // 飞出面板：按展开态渲染子树，且用面板内自持的展开态，
 // 不回写外层侧栏的 openKeys（避免折叠飞出里的展开污染整栏）。
@@ -47,9 +48,9 @@ provide('gvaMenuCtx', {
     <PopoverTrigger as-child>
       <button
         type="button"
-        :class="[MENU_ICON_BUTTON, FOCUS_RING, isActive() && 'text-active']"
+        :class="menuRailButton(ctx.theme.value, isActive(), showTitle)"
         :style="{ height: ctx.itemHeight.value + 'px' }"
-        :title="node.meta.title"
+        :title="showTitle ? null : node.meta.title"
         @mouseenter="enter"
         @mouseleave="leave"
         @click="ctx.select(node.name)"
